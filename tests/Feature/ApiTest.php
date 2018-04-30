@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Submission;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,8 +16,24 @@ class ApiTest extends TestCase
      */
     public function testSubmissionIndex()
     {
-        $response = $this->post('/api/submission', ['text'=>'test']);
+        $test = '_test_';
         
-        $response->assertJsonFragment(['data'=>'test']);
+        $response = $this->post('/api/submission', [
+            'text'=> $test,
+            'user_id' => 1
+        ]);
+        
+        $response->assertJsonFragment(['status'=>'ok']);
+        
+        //delete the currently created test
+        Submission::where('text','=', $test)->delete();
+        
+        
+    }
+    
+    public function testGetAllSubmissions(){
+        $count = Submission::all()->count();
+        $response = $this->get('/api/submissions');
+        $response->assertJsonCount($count);
     }
 }

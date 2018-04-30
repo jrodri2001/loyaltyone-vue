@@ -1,5 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-    <submissions-component></submissions-component>
+    <submissions-component :user="{{Auth::user()}}"></submissions-component>
 @endsection

@@ -47339,15 +47339,38 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
     mounted: function mounted() {
         console.log('Submissions Component mounted.');
+        this.getAllSubmissions();
     },
     data: function data() {
         return {
             text: '',
-            response: ''
+            response: '',
+            submissions: []
         };
     },
 
@@ -47357,8 +47380,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this = this;
 
             console.log('time to submit the form');
-            axios.post('/api/submission', { text: this.text }).then(function (result) {
-                return _this.response = result.data.data;
+            axios.post('/api/submission', { text: this.text, user_id: this.user.id }).then(function (result) {
+                _this.response = result.data.message;
+                _this.getAllSubmissions();
+            });
+        },
+        getAllSubmissions: function getAllSubmissions() {
+            var _this2 = this;
+
+            console.log('getting all the submissions');
+            axios.get('/api/submissions').then(function (result) {
+                return _this2.submissions = result.data;
             });
         }
     }
@@ -47374,75 +47406,126 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
     _c("div", { staticClass: "row justify-content-center" }, [
-      _c("div", { staticClass: "col-md-8" }, [
-        _c("div", { staticClass: "card card-default" }, [
-          _c("div", { staticClass: "card-header" }, [_vm._v("Submissions")]),
-          _vm._v(" "),
-          _c("div", { staticClass: "card-body" }, [
-            _c("div", { staticClass: "card-title" }, [
-              _vm._v(
-                "\n                        Create a submission\n                    "
-              )
-            ]),
+      _c(
+        "div",
+        { staticClass: "col-md-8" },
+        [
+          _c("div", { staticClass: "card card-default" }, [
+            _c("div", { staticClass: "card-header" }, [_vm._v("Submissions")]),
             _vm._v(" "),
-            _c("div", { staticClass: "card-text" }, [
-              _c(
-                "form",
-                {
-                  attrs: { action: "/api/submission", method: "POST" },
-                  on: {
-                    submit: function($event) {
-                      $event.preventDefault()
-                      return _vm.onSubmit($event)
+            _c("div", { staticClass: "card-body" }, [
+              _c("div", { staticClass: "card-title" }, [
+                _vm._v(
+                  "\n                        Create a submission\n                    "
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-text" }, [
+                _c(
+                  "form",
+                  {
+                    attrs: { action: "/api/submission", method: "POST" },
+                    on: {
+                      submit: function($event) {
+                        $event.preventDefault()
+                        return _vm.onSubmit($event)
+                      }
                     }
-                  }
-                },
-                [
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "text" } }, [_vm._v("Text")]),
+                  },
+                  [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c(
+                        "label",
+                        {
+                          model: {
+                            value: _vm.user,
+                            callback: function($$v) {
+                              _vm.user = $$v
+                            },
+                            expression: "user"
+                          }
+                        },
+                        [_vm._v("User " + _vm._s(_vm.user.name))]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "text" } }, [_vm._v("Text")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.text,
+                            expression: "text"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          id: "text",
+                          placeholder: "Text",
+                          required: ""
+                        },
+                        domProps: { value: _vm.text },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.text = $event.target.value
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _vm.response
+                        ? _c("p", [
+                            _vm._v(
+                              "this is the result: " + _vm._s(_vm.response)
+                            )
+                          ])
+                        : _vm._e()
+                    ]),
                     _vm._v(" "),
                     _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.text,
-                          expression: "text"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        id: "text",
-                        placeholder: "Text",
-                        required: ""
-                      },
-                      domProps: { value: _vm.text },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.text = $event.target.value
-                        }
-                      }
+                      staticClass: "btn btn-primary",
+                      attrs: { type: "submit", value: "Done" }
                     })
-                  ]),
-                  _vm._v(" "),
-                  _c("input", {
-                    staticClass: "btn btn-primary",
-                    attrs: { type: "submit", value: "Done" }
-                  })
-                ]
-              )
-            ]),
-            _vm._v(" "),
-            _vm.response
-              ? _c("p", [_vm._v("this is the result " + _vm._s(_vm.response))])
-              : _vm._e()
-          ])
-        ])
-      ])
+                  ]
+                )
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("h2", [_vm._v("Previous submissions")]),
+          _vm._v(" "),
+          _vm._l(_vm.submissions, function(item) {
+            return [
+              _c("div", { staticClass: "card card-default" }, [
+                _c("div", { staticClass: "card-header" }, [
+                  _vm._v(
+                    "\n                        Sent by " +
+                      _vm._s(item.user.name) +
+                      " on " +
+                      _vm._s(_vm._f("date 'Y-m-d'")(item.created_at)) +
+                      "\n                    "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "card-body" }, [
+                  _vm._v(
+                    "\n                        " +
+                      _vm._s(item.text) +
+                      "\n                    "
+                  )
+                ])
+              ])
+            ]
+          })
+        ],
+        2
+      )
     ])
   ])
 }
