@@ -15,8 +15,8 @@ class ApiTest extends TestCase
      */
     public function testSubmissionIndex()
     {
-        $response = $this->get('/api/submission/test');
+        $response = $this->post('/api/submission', ['text'=>'test']);
         
-        $response->assertJsonFragment(['test']);
+        $response->assertJsonFragment(['data'=>'test']);
     }
 }
