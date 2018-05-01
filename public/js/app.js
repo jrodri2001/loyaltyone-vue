@@ -47377,9 +47377,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
+    props: ['user', 'gkey'],
 
     mounted: function mounted() {
         console.log('Submissions Component mounted.');
@@ -47391,7 +47402,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             response: '',
             submissions: [],
             showReplyBox: [],
-            replytext: ''
+            replytext: '',
+            city: '',
+            coords: [],
+            weather: []
         };
     },
 
@@ -47401,7 +47415,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this = this;
 
             console.log('time to submit the form');
-            axios.post('/api/submission', { text: this.text, user_id: this.user.id }).then(function (result) {
+            axios.post('/api/submission', {
+                text: this.text,
+                user_id: this.user.id,
+                city: this.city
+            }).then(function (result) {
                 _this.response = result.data.message;
                 _this.getAllSubmissions();
             });
@@ -47424,13 +47442,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         onReply: function onReply(item, index) {
             var _this3 = this;
 
-            console.log('replying to item ', item.id);
+            console.log('replying to item ' + item.id);
             axios.post('/api/submission/reply/' + item.id, {
                 text: this.replytext,
                 user_id: item.user.id
             }).then(function (result) {
                 _this3.response = result.data.message;
                 _this3.getAllSubmissions();
+            });
+        },
+        getCoordenates: function getCoordenates(city, index) {
+            console.log('getting coordenates for ' + city);
+            var self = this;
+            axios.get('/api/weather/' + city).then(function (result) {
+                self.coords[index] = result.data.coord;
+                self.weather[index] = result.data.main.temp;
+                console.log(result.data.main);
             });
         }
     }
@@ -47501,16 +47528,45 @@ var render = function() {
                             _vm.text = $event.target.value
                           }
                         }
-                      }),
-                      _vm._v(" "),
-                      _vm.response
-                        ? _c("p", [
-                            _vm._v(
-                              "this is the result: " + _vm._s(_vm.response)
-                            )
-                          ])
-                        : _vm._e()
+                      })
                     ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "city" } }, [_vm._v("City")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.city,
+                            expression: "city"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          id: "city",
+                          placeholder: "City",
+                          required: ""
+                        },
+                        domProps: { value: _vm.city },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.city = $event.target.value
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _vm.response
+                      ? _c("p", [
+                          _vm._v("this is the result: " + _vm._s(_vm.response))
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _c("input", {
                       staticClass: "btn btn-primary",
@@ -47529,12 +47585,33 @@ var render = function() {
               _c("div", { staticClass: "card card-default mb-2" }, [
                 _c("div", { staticClass: "card-header" }, [
                   _vm._v(
-                    "\n                        Sent by " +
+                    "\n                        " +
+                      _vm._s(_vm.getCoordenates(item.city, index)) +
+                      "\n                        Sent by " +
                       _vm._s(item.user.name) +
                       " on " +
                       _vm._s(item.created_at) +
-                      "\n                    "
-                  )
+                      " from " +
+                      _vm._s(item.city) +
+                      "\n                        "
+                  ),
+                  _vm.coords[index]
+                    ? _c("span", [
+                        _vm._v(
+                          "(" +
+                            _vm._s(_vm.coords[index].lat) +
+                            ", " +
+                            _vm._s(_vm.coords[index].lon) +
+                            ")"
+                        )
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.weather[index]
+                    ? _c("span", [
+                        _vm._v("Temp: " + _vm._s(_vm.weather[index]))
+                      ])
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c(

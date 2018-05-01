@@ -8,7 +8,7 @@ class Submission extends Model
 {
     protected $table = "submissions";
     
-    protected $fillable = ['text', 'user_id'];
+    protected $fillable = ['text', 'user_id', 'city'];
     
     public function user()
     {

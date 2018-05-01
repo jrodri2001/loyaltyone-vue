@@ -15,8 +15,16 @@
                                     <label for="text">Text</label>
                                     <input v-model="text" type="text" class="form-control" id="text" placeholder="Text"
                                            required>
-                                    <p v-if="response">this is the result: {{ response }}</p>
+
                                 </div>
+
+                                <div class="form-group">
+                                    <label for="city">City</label>
+                                    <input v-model="city" type="text" class="form-control" id="city" placeholder="City"
+                                           required>
+                                </div>
+
+                                <p v-if="response">this is the result: {{ response }}</p>
 
                                 <input type="submit" class="btn btn-primary" value="Done">
                             </form>
@@ -30,7 +38,10 @@
                 <template v-for="(item, index) in submissions">
                     <div class="card card-default mb-2">
                         <div class="card-header">
-                            Sent by {{item.user.name}} on {{ item.created_at}}
+                            {{getCoordenates(item.city, index)}}
+                            Sent by {{item.user.name}} on {{ item.created_at}} from {{item.city}}
+                            <span v-if="coords[index]">({{coords[index].lat}}, {{coords[index].lon}})</span>
+                            <span v-if="weather[index]">Temp: {{weather[index]}}</span>
                         </div>
                         <div class="card-body pr-2">
                             <div class="card-text">
@@ -67,7 +78,7 @@
 
 <script>
     export default {
-        props: ['user'],
+        props: ['user', 'gkey'],
 
         mounted() {
             console.log('Submissions Component mounted.');
@@ -80,7 +91,10 @@
                 response: '',
                 submissions: [],
                 showReplyBox: [],
-                replytext:''
+                replytext:'',
+                city:'',
+                coords:[],
+                weather:[]
             }
         },
 
@@ -88,7 +102,11 @@
 
             onSubmit() {
                 console.log('time to submit the form');
-                axios.post('/api/submission', {text: this.text, user_id: this.user.id}).then(
+                axios.post('/api/submission', {
+                    text: this.text,
+                    user_id: this.user.id,
+                    city: this.city
+                }).then(
                     (result) => {
                         this.response = result.data.message;
                         this.getAllSubmissions();
@@ -109,7 +127,7 @@
             },
 
             onReply(item, index){
-                console.log('replying to item ', item.id);
+                console.log('replying to item ' + item.id);
                 axios.post('/api/submission/reply/' + item.id, {
                     text: this.replytext,
                     user_id: item.user.id
@@ -118,6 +136,18 @@
                         this.response = result.data.message;
                         this.getAllSubmissions();
                     })
+            },
+
+            getCoordenates(city,index){
+                console.log('getting coordenates for ' + city);
+                var self = this;
+                axios.get('/api/weather/' + city).then(
+                    (result) =>{
+                       self.coords[index] = result.data.coord;
+                        self.weather[index] = result.data.main.temp;
+                       console.log(result.data.main);
+                    }
+                );
             }
         },
     }

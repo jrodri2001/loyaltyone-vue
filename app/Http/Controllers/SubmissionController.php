@@ -9,14 +9,16 @@ class SubmissionController extends Controller
 {
     public function index(Request $request){
         $this->validate($request,[
-            'text'=>"required",
-            'user_id'=>"required"
+            'text' => "required",
+            'user_id' => "required",
+            'city' => 'required'
         ]);
         
         //lets persist this value in the database
         $submission = Submission::create([
             'text'=>$request->input('text'),
-            'user_id'=> $request->input('user_id')
+            'user_id'=> $request->input('user_id'),
+            'city' => $request->input('city')
         ]);
     
         if (!$submission) {
@@ -50,6 +52,73 @@ class SubmissionController extends Controller
     
         return $this->sendResponse('ok', 'A reply has been recorded');
     }
+    
+    public function latlong($city){
+        /*
+    Builds the URL and request to the Google Maps API
+  */
+        $url = 'http://maps.googleapis.com/maps/api/geocode/json?address='.urlencode( $city).'&key='.config( 'google_key' );
+    
+        /*
+          Creates a Guzzle Client to make the Google Maps request.
+        */
+        $client = new \GuzzleHttp\Client();
+    
+        /*
+          Send a GET request to the Google Maps API and get the body of the
+          response.
+        */
+        $geocodeResponse = $client->get( $url )->getBody();
+    
+        /*
+          JSON decodes the response
+        */
+        $geocodeData = json_decode( $geocodeResponse );
+    
+        /*
+          Initializes the response for the GeoCode Location
+        */
+        $coordinates['lat'] = null;
+        $coordinates['lng'] = null;
+    
+        /*
+          If the response is not empty (something returned),
+          we extract the latitude and longitude from the
+          data.
+        */
+        if( !empty( $geocodeData )
+            && $geocodeData->status != 'ZERO_RESULTS'
+            && isset( $geocodeData->results )
+            && isset( $geocodeData->results[0] ) ){
+            $coordinates['lat'] = $geocodeData->results[0]->geometry->location->lat;
+            $coordinates['lng'] = $geocodeData->results[0]->geometry->location->lng;
+        }
+    
+        /*
+          Return the found coordinates.
+        */
+        return $coordinates;
+    }
+    
+    
+    public function weather($city){
+       
+        $url = 'http://api.openweathermap.org/data/2.5/weather?q='.urlencode( $city).'&units=metric&appid='.config( 'app.weather_api' );
+        
+        /*
+          Creates a Guzzle Client to make the Google Maps request.
+        */
+        $client = new \GuzzleHttp\Client();
+        
+        /*
+          Send a GET request to the Google Maps API and get the body of the
+          response.
+        */
+        $geocodeResponse = $client->get( $url )->getBody();
+  
+        return $geocodeResponse;
+    }
+    
     
     private function sendResponse($status, $message = null, $data = null)
     {

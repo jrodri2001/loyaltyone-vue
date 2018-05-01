@@ -23,3 +23,7 @@ Route::post('submission', 'SubmissionController@index');
 Route::get('submissions', 'SubmissionController@view');
 
 Route::post('submission/reply/{id}', 'SubmissionController@reply');
+
+Route::get('latlong/{city}', 'SubmissionController@latlong');
+
+Route::get('weather/{city}', 'SubmissionController@weather');
