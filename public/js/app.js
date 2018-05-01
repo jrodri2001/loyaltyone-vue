@@ -47393,6 +47393,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user', 'gkey'],
@@ -47451,7 +47455,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             console.log('replying to item ' + item.id);
             axios.post('/api/submission/reply/' + item.id, {
                 text: this.replytext,
-                user_id: item.user.id,
+                user_id: this.user.id,
                 city: this.replycity
             }).then(function (result) {
                 _this3.response = result.data.message;
@@ -47741,7 +47745,7 @@ var render = function() {
                     _vm._l(item.all_replies, function(reply) {
                       return _c("replies-component", {
                         key: item.id,
-                        attrs: { current: reply }
+                        attrs: { current: reply, user: _vm.user }
                       })
                     })
                   ],
@@ -47884,7 +47888,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['current'],
+    props: ['current', 'user'],
 
     mounted: function mounted() {
         console.log('Loaded a reply' + this.index);
@@ -47919,6 +47923,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 city: item.city
             }).then(function (result) {
                 _this.response = result.data.message;
+                //todo: fix this, when 2nd level stops working. Event maybe
                 _this.$parent.getAllSubmissions();
             });
         }
@@ -48088,7 +48093,7 @@ var render = function() {
         _vm._l(_vm.current.all_replies, function(reply) {
           return _c("replies-component", {
             key: _vm.current.id,
-            attrs: { current: reply }
+            attrs: { current: reply, user: _vm.user }
           })
         })
       ],

@@ -71,7 +71,11 @@
                                 </div>
                             </div>
 
-                            <replies-component v-for="reply in item.all_replies" :current="reply" :key="item.id"></replies-component>
+                            <replies-component
+                                    v-for="reply in item.all_replies"
+                                    :current="reply"
+                                    :key="item.id"
+                                    :user="user"></replies-component>
                         </div>
                     </div>
                 </template>
@@ -135,7 +139,7 @@
                 console.log('replying to item ' + item.id);
                 axios.post('/api/submission/reply/' + item.id, {
                     text: this.replytext,
-                    user_id: item.user.id,
+                    user_id: this.user.id,
                     city: this.replycity
                 }).then(
                     (result) => {

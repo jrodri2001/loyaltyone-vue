@@ -25,8 +25,7 @@
 
                             <div class="form-group">
                                 <label for="repycity">City</label>
-                                <input v-model="repycity" type="text" class="form-control" id="repycity" placeholder="City"
-                                       required>
+                                <input v-model="repycity" type="text" class="form-control" id="repycity" placeholder="City" required>
                             </div>
 
                             <input type="submit" class="btn btn-primary" value="Done" @click.prevent="onReply(current)">
@@ -39,7 +38,8 @@
             <replies-component
                     v-for="reply in current.all_replies"
                     :current="reply"
-                    :key="current.id">
+                    :key="current.id"
+                    :user="user">
             </replies-component>
         </div>
 
@@ -49,7 +49,7 @@
 
 <script>
     export default {
-        props: ['current'],
+        props: ['current', 'user'],
 
         mounted() {
             console.log('Loaded a reply' + this.index);
@@ -84,6 +84,7 @@
                 }).then(
                     (result) => {
                         this.response = result.data.message;
+                        //todo: fix this, when 2nd level stops working. Event maybe
                         this.$parent.getAllSubmissions();
                     })
             },
