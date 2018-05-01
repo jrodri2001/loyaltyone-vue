@@ -1,6 +1,9 @@
 <template>
     <div class="card card-default mb-3 mt-3">
-        <div class="card-header">Sent by {{current.user.name}} on {{ current.created_at}} </div>
+        <div class="card-header">
+            Sent by {{current.user.name}} on {{ current.created_at}} from {{current.city}}
+            <weather-component :city="current.city"></weather-component>
+        </div>
         <div class="card-body pr-2">
             <div class="card-text">
                 {{ current.text }}
@@ -18,6 +21,12 @@
                             <div class="form-group">
                                 <label for="replytext">Text</label>
                                 <input v-model="replytext" type="text" class="form-control" id="replytext" placeholder="Text" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="repycity">City</label>
+                                <input v-model="repycity" type="text" class="form-control" id="repycity" placeholder="City"
+                                       required>
                             </div>
 
                             <input type="submit" class="btn btn-primary" value="Done" @click.prevent="onReply(current)">
@@ -51,6 +60,7 @@
             return {
                 showReplyBox: false,
                 replytext: '',
+                repycity: ''
             }
         },
 
@@ -69,7 +79,8 @@
                 console.log(item);
                 axios.post('/api/submission/reply/' + item.id, {
                     text: this.replytext,
-                    user_id: item.user_id
+                    user_id: item.user_id,
+                    city: item.city
                 }).then(
                     (result) => {
                         this.response = result.data.message;

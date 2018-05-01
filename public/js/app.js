@@ -13893,6 +13893,7 @@ window.Vue = __webpack_require__(36);
 
 Vue.component('submissions-component', __webpack_require__(39));
 Vue.component('replies-component', __webpack_require__(52));
+Vue.component('weather-component', __webpack_require__(55));
 
 var app = new Vue({
   el: '#app'
@@ -47388,6 +47389,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user', 'gkey'],
@@ -47403,6 +47408,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             submissions: [],
             showReplyBox: [],
             replytext: '',
+            replycity: '',
             city: '',
             coords: [],
             weather: []
@@ -47445,19 +47451,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             console.log('replying to item ' + item.id);
             axios.post('/api/submission/reply/' + item.id, {
                 text: this.replytext,
-                user_id: item.user.id
+                user_id: item.user.id,
+                city: this.replycity
             }).then(function (result) {
                 _this3.response = result.data.message;
                 _this3.getAllSubmissions();
-            });
-        },
-        getCoordenates: function getCoordenates(city, index) {
-            console.log('getting coordenates for ' + city);
-            var self = this;
-            axios.get('/api/weather/' + city).then(function (result) {
-                self.coords[index] = result.data.coord;
-                self.weather[index] = result.data.main.temp;
-                console.log(result.data.main);
             });
         }
     }
@@ -47583,36 +47581,23 @@ var render = function() {
           _vm._l(_vm.submissions, function(item, index) {
             return [
               _c("div", { staticClass: "card card-default mb-2" }, [
-                _c("div", { staticClass: "card-header" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(_vm.getCoordenates(item.city, index)) +
-                      "\n                        Sent by " +
-                      _vm._s(item.user.name) +
-                      " on " +
-                      _vm._s(item.created_at) +
-                      " from " +
-                      _vm._s(item.city) +
-                      "\n                        "
-                  ),
-                  _vm.coords[index]
-                    ? _c("span", [
-                        _vm._v(
-                          "(" +
-                            _vm._s(_vm.coords[index].lat) +
-                            ", " +
-                            _vm._s(_vm.coords[index].lon) +
-                            ")"
-                        )
-                      ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.weather[index]
-                    ? _c("span", [
-                        _vm._v("Temp: " + _vm._s(_vm.weather[index]))
-                      ])
-                    : _vm._e()
-                ]),
+                _c(
+                  "div",
+                  { staticClass: "card-header" },
+                  [
+                    _vm._v(
+                      "\n\n                        Sent by " +
+                        _vm._s(item.user.name) +
+                        " on " +
+                        _vm._s(item.created_at) +
+                        " from " +
+                        _vm._s(item.city) +
+                        "\n                        "
+                    ),
+                    _c("weather-component", { attrs: { city: item.city } })
+                  ],
+                  1
+                ),
                 _vm._v(" "),
                 _c(
                   "div",
@@ -47695,6 +47680,41 @@ var render = function() {
                                               return
                                             }
                                             _vm.replytext = $event.target.value
+                                          }
+                                        }
+                                      })
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("div", { staticClass: "form-group" }, [
+                                      _c(
+                                        "label",
+                                        { attrs: { for: "replycity" } },
+                                        [_vm._v("City")]
+                                      ),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.replycity,
+                                            expression: "replycity"
+                                          }
+                                        ],
+                                        staticClass: "form-control",
+                                        attrs: {
+                                          type: "text",
+                                          id: "replycity",
+                                          placeholder: "City",
+                                          required: ""
+                                        },
+                                        domProps: { value: _vm.replycity },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.replycity = $event.target.value
                                           }
                                         }
                                       })
@@ -47853,6 +47873,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['current'],
@@ -47864,7 +47893,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             showReplyBox: false,
-            replytext: ''
+            replytext: '',
+            repycity: ''
         };
     },
 
@@ -47885,7 +47915,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             console.log(item);
             axios.post('/api/submission/reply/' + item.id, {
                 text: this.replytext,
-                user_id: item.user_id
+                user_id: item.user_id,
+                city: item.city
             }).then(function (result) {
                 _this.response = result.data.message;
                 _this.$parent.getAllSubmissions();
@@ -47906,15 +47937,23 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "card card-default mb-3 mt-3" }, [
-    _c("div", { staticClass: "card-header" }, [
-      _vm._v(
-        "Sent by " +
-          _vm._s(_vm.current.user.name) +
-          " on " +
-          _vm._s(_vm.current.created_at) +
-          " "
-      )
-    ]),
+    _c(
+      "div",
+      { staticClass: "card-header" },
+      [
+        _vm._v(
+          "\n        Sent by " +
+            _vm._s(_vm.current.user.name) +
+            " on " +
+            _vm._s(_vm.current.created_at) +
+            " from " +
+            _vm._s(_vm.current.city) +
+            "\n        "
+        ),
+        _c("weather-component", { attrs: { city: _vm.current.city } })
+      ],
+      1
+    ),
     _vm._v(" "),
     _c(
       "div",
@@ -47995,6 +48034,39 @@ var render = function() {
                           })
                         ]),
                         _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", { attrs: { for: "repycity" } }, [
+                            _vm._v("City")
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.repycity,
+                                expression: "repycity"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              id: "repycity",
+                              placeholder: "City",
+                              required: ""
+                            },
+                            domProps: { value: _vm.repycity },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.repycity = $event.target.value
+                              }
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
                         _c("input", {
                           staticClass: "btn btn-primary",
                           attrs: { type: "submit", value: "Done" },
@@ -48031,6 +48103,127 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
     require("vue-hot-reload-api")      .rerender("data-v-8065b990", module.exports)
+  }
+}
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(40)
+/* script */
+var __vue_script__ = __webpack_require__(56)
+/* template */
+var __vue_template__ = __webpack_require__(57)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/assets/js/components/WeatherComponent.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-bb0375c0", Component.options)
+  } else {
+    hotAPI.reload("data-v-bb0375c0", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 56 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['city'],
+
+    mounted: function mounted() {
+        console.log('Weather Component mounted.');
+        this.getWeather();
+    },
+    data: function data() {
+        return {
+            lat: '',
+            lon: '',
+            temp: ''
+        };
+    },
+
+
+    methods: {
+        getWeather: function getWeather() {
+            var _this = this;
+
+            console.log('getting weather for ' + this.city);
+
+            axios.get('/api/weather/' + this.city).then(function (result) {
+                _this.temp = result.data.main.temp;
+                _this.lat = result.data.coord.lat;
+                _this.lon = result.data.coord.lon;
+            });
+        }
+    }
+});
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "weather" }, [
+    _vm.lat
+      ? _c("span", [
+          _vm._v("(lat: " + _vm._s(_vm.lat) + ", lon:" + _vm._s(_vm.lon) + ")")
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.temp ? _c("span", [_vm._v(_vm._s(_vm.temp) + "C")]) : _vm._e()
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-bb0375c0", module.exports)
   }
 }
 

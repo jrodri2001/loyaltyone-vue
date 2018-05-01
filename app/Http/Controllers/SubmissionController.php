@@ -41,6 +41,7 @@ class SubmissionController extends Controller
         $this->validate($request, [
             'text' => "required",
             'user_id' => "required",
+            'city' => 'required'
         ]);
     
         $submission = Submission::find($id);
@@ -48,6 +49,7 @@ class SubmissionController extends Controller
         $submission->replies()->create([
             'text'=>$request->input('text'),
             'user_id'=>$request->input('user_id'),
+            'city'=>$request->input('city'),
         ]);
     
         return $this->sendResponse('ok', 'A reply has been recorded');

@@ -38,10 +38,9 @@
                 <template v-for="(item, index) in submissions">
                     <div class="card card-default mb-2">
                         <div class="card-header">
-                            {{getCoordenates(item.city, index)}}
+
                             Sent by {{item.user.name}} on {{ item.created_at}} from {{item.city}}
-                            <span v-if="coords[index]">({{coords[index].lat}}, {{coords[index].lon}})</span>
-                            <span v-if="weather[index]">Temp: {{weather[index]}}</span>
+                            <weather-component :city="item.city"></weather-component>
                         </div>
                         <div class="card-body pr-2">
                             <div class="card-text">
@@ -59,6 +58,11 @@
                                             <div class="form-group">
                                                 <label for="text">Text</label>
                                                 <input v-model="replytext" type="text" class="form-control" id="replytext" placeholder="Text" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="replycity">City</label>
+                                                <input v-model="replycity" type="text" class="form-control" id="replycity" placeholder="City" required>
                                             </div>
 
                                             <input type="submit" class="btn btn-primary" value="Done" @click.prevent="onReply(item,index)">
@@ -92,6 +96,7 @@
                 submissions: [],
                 showReplyBox: [],
                 replytext:'',
+                replycity:'',
                 city:'',
                 coords:[],
                 weather:[]
@@ -130,7 +135,8 @@
                 console.log('replying to item ' + item.id);
                 axios.post('/api/submission/reply/' + item.id, {
                     text: this.replytext,
-                    user_id: item.user.id
+                    user_id: item.user.id,
+                    city: this.replycity
                 }).then(
                     (result) => {
                         this.response = result.data.message;
@@ -138,17 +144,6 @@
                     })
             },
 
-            getCoordenates(city,index){
-                console.log('getting coordenates for ' + city);
-                var self = this;
-                axios.get('/api/weather/' + city).then(
-                    (result) =>{
-                       self.coords[index] = result.data.coord;
-                        self.weather[index] = result.data.main.temp;
-                       console.log(result.data.main);
-                    }
-                );
-            }
         },
     }
 
