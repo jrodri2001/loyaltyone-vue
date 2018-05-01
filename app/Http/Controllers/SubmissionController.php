@@ -31,7 +31,24 @@ class SubmissionController extends Controller
     
     
     public function view(){
-        return Submission::with('user')->orderby('created_at','desc')->get();
+        return Submission::with(['user','allReplies'])->where('parent_id',0)->orderby('created_at','desc')->get();
+    }
+    
+    
+    public function reply(Request $request, $id){
+        $this->validate($request, [
+            'text' => "required",
+            'user_id' => "required",
+        ]);
+    
+        $submission = Submission::find($id);
+        
+        $submission->replies()->create([
+            'text'=>$request->input('text'),
+            'user_id'=>$request->input('user_id'),
+        ]);
+    
+        return $this->sendResponse('ok', 'A reply has been recorded');
     }
     
     private function sendResponse($status, $message = null, $data = null)

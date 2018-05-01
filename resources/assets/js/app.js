@@ -16,6 +16,7 @@ window.Vue = require('vue');
  */
 
 Vue.component('submissions-component', require('./components/SubmissionsComponent.vue'));
+Vue.component('replies-component', require('./components/SubmissionRepliesComponent.vue'));
 
 const app = new Vue({
     el: '#app'

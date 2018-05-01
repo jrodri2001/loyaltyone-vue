@@ -21,3 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('submission', 'SubmissionController@index');
 
 Route::get('submissions', 'SubmissionController@view');
+
+Route::post('submission/reply/{id}', 'SubmissionController@reply');

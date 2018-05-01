@@ -13892,6 +13892,7 @@ window.Vue = __webpack_require__(36);
  */
 
 Vue.component('submissions-component', __webpack_require__(39));
+Vue.component('replies-component', __webpack_require__(52));
 
 var app = new Vue({
   el: '#app'
@@ -47358,6 +47359,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user'],
@@ -47370,7 +47389,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {
             text: '',
             response: '',
-            submissions: []
+            submissions: [],
+            showReplyBox: [],
+            replytext: ''
         };
     },
 
@@ -47391,6 +47412,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             console.log('getting all the submissions');
             axios.get('/api/submissions').then(function (result) {
                 return _this2.submissions = result.data;
+            });
+        },
+        showReplyForm: function showReplyForm(index) {
+            if (this.showReplyBox[index]) {
+                Vue.set(this.showReplyBox, index, 0);
+            } else {
+                Vue.set(this.showReplyBox, index, 1);
+            }
+        },
+        onReply: function onReply(item, index) {
+            var _this3 = this;
+
+            console.log('replying to item ', item.id);
+            axios.post('/api/submission/reply/' + item.id, {
+                text: this.replytext,
+                user_id: item.user.id
+            }).then(function (result) {
+                _this3.response = result.data.message;
+                _this3.getAllSubmissions();
             });
         }
     }
@@ -47413,10 +47453,10 @@ var render = function() {
           _c("div", { staticClass: "card card-default" }, [
             _c("div", { staticClass: "card-header" }, [_vm._v("Submissions")]),
             _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
+            _c("div", { staticClass: "card-body pr-2" }, [
               _c("div", { staticClass: "card-title" }, [
                 _vm._v(
-                  "\n                        Create a submission\n                    "
+                  "\n                        Submit your message\n                    "
                 )
               ]),
               _vm._v(" "),
@@ -47433,22 +47473,6 @@ var render = function() {
                     }
                   },
                   [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        {
-                          model: {
-                            value: _vm.user,
-                            callback: function($$v) {
-                              _vm.user = $$v
-                            },
-                            expression: "user"
-                          }
-                        },
-                        [_vm._v("User " + _vm._s(_vm.user.name))]
-                      )
-                    ]),
-                    _vm._v(" "),
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "text" } }, [_vm._v("Text")]),
                       _vm._v(" "),
@@ -47500,26 +47524,132 @@ var render = function() {
           _vm._v(" "),
           _c("h2", [_vm._v("Previous submissions")]),
           _vm._v(" "),
-          _vm._l(_vm.submissions, function(item) {
+          _vm._l(_vm.submissions, function(item, index) {
             return [
-              _c("div", { staticClass: "card card-default" }, [
+              _c("div", { staticClass: "card card-default mb-2" }, [
                 _c("div", { staticClass: "card-header" }, [
                   _vm._v(
                     "\n                        Sent by " +
                       _vm._s(item.user.name) +
                       " on " +
-                      _vm._s(_vm._f("date 'Y-m-d'")(item.created_at)) +
+                      _vm._s(item.created_at) +
                       "\n                    "
                   )
                 ]),
                 _vm._v(" "),
-                _c("div", { staticClass: "card-body" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(item.text) +
-                      "\n                    "
-                  )
-                ])
+                _c(
+                  "div",
+                  { staticClass: "card-body pr-2" },
+                  [
+                    _c("div", { staticClass: "card-text" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(item.text) +
+                          "\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "a",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { href: "#" },
+                        on: {
+                          click: function($event) {
+                            $event.preventDefault()
+                            _vm.showReplyForm(index)
+                          }
+                        }
+                      },
+                      [_vm._v("Reply")]
+                    ),
+                    _vm._v(" "),
+                    _vm.showReplyBox[index]
+                      ? _c(
+                          "div",
+                          {
+                            staticClass:
+                              "card text-white bg-secondary mb-3 mt-3"
+                          },
+                          [
+                            _c("div", { staticClass: "card-header" }, [
+                              _vm._v("Reply Form")
+                            ]),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "card-body" }, [
+                              _c("div", { staticClass: "card-text" }, [
+                                _c(
+                                  "form",
+                                  {
+                                    attrs: { action: "", method: "POST" },
+                                    on: {
+                                      submit: function($event) {
+                                        $event.preventDefault()
+                                        return _vm.onSubmitReply($event)
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _c("div", { staticClass: "form-group" }, [
+                                      _c("label", { attrs: { for: "text" } }, [
+                                        _vm._v("Text")
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.replytext,
+                                            expression: "replytext"
+                                          }
+                                        ],
+                                        staticClass: "form-control",
+                                        attrs: {
+                                          type: "text",
+                                          id: "replytext",
+                                          placeholder: "Text",
+                                          required: ""
+                                        },
+                                        domProps: { value: _vm.replytext },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.replytext = $event.target.value
+                                          }
+                                        }
+                                      })
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      staticClass: "btn btn-primary",
+                                      attrs: { type: "submit", value: "Done" },
+                                      on: {
+                                        click: function($event) {
+                                          $event.preventDefault()
+                                          _vm.onReply(item, index)
+                                        }
+                                      }
+                                    })
+                                  ]
+                                )
+                              ])
+                            ])
+                          ]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm._l(item.all_replies, function(reply) {
+                      return _c("replies-component", {
+                        key: item.id,
+                        attrs: { current: reply }
+                      })
+                    })
+                  ],
+                  2
+                )
               ])
             ]
           })
@@ -47544,6 +47674,288 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 44 */,
+/* 45 */,
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(40)
+/* script */
+var __vue_script__ = __webpack_require__(53)
+/* template */
+var __vue_template__ = __webpack_require__(54)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/assets/js/components/SubmissionRepliesComponent.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-8065b990", Component.options)
+  } else {
+    hotAPI.reload("data-v-8065b990", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 53 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['current'],
+
+    mounted: function mounted() {
+        console.log('Loaded a reply' + this.index);
+        console.log(this.current);
+    },
+    data: function data() {
+        return {
+            showReplyBox: false,
+            replytext: ''
+        };
+    },
+
+
+    methods: {
+        showReplyForm: function showReplyForm() {
+            console.log('showing reply form');
+            if (this.showReplyBox) {
+                this.showReplyBox = false;
+            } else {
+                this.showReplyBox = true;
+            }
+        },
+        onReply: function onReply(item) {
+            var _this = this;
+
+            console.log('replying to item ', item.id);
+            console.log(item);
+            axios.post('/api/submission/reply/' + item.id, {
+                text: this.replytext,
+                user_id: item.user_id
+            }).then(function (result) {
+                _this.response = result.data.message;
+                _this.$parent.getAllSubmissions();
+            });
+        }
+    },
+
+    name: 'more-replies'
+
+});
+
+/***/ }),
+/* 54 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "card card-default mb-3 mt-3" }, [
+    _c("div", { staticClass: "card-header" }, [
+      _vm._v(
+        "Sent by " +
+          _vm._s(_vm.current.user.name) +
+          " on " +
+          _vm._s(_vm.current.created_at) +
+          " "
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "card-body pr-2" },
+      [
+        _c("div", { staticClass: "card-text" }, [
+          _vm._v("\n            " + _vm._s(_vm.current.text) + "\n        ")
+        ]),
+        _vm._v(" "),
+        _c(
+          "a",
+          {
+            staticClass: "btn btn-secondary",
+            attrs: { href: "#" },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                _vm.showReplyForm()
+              }
+            }
+          },
+          [_vm._v("Reply")]
+        ),
+        _vm._v(" "),
+        _vm.showReplyBox
+          ? _c(
+              "div",
+              { staticClass: "card text-white bg-secondary mb-3 mt-3" },
+              [
+                _c("div", { staticClass: "card-header" }, [
+                  _vm._v("Reply Form")
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "card-body pr-2" }, [
+                  _c("div", { staticClass: "card-text" }, [
+                    _c(
+                      "form",
+                      {
+                        attrs: { action: "", method: "POST" },
+                        on: {
+                          submit: function($event) {
+                            $event.preventDefault()
+                            return _vm.onSubmitReply($event)
+                          }
+                        }
+                      },
+                      [
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", { attrs: { for: "replytext" } }, [
+                            _vm._v("Text")
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.replytext,
+                                expression: "replytext"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              id: "replytext",
+                              placeholder: "Text",
+                              required: ""
+                            },
+                            domProps: { value: _vm.replytext },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.replytext = $event.target.value
+                              }
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "submit", value: "Done" },
+                          on: {
+                            click: function($event) {
+                              $event.preventDefault()
+                              _vm.onReply(_vm.current)
+                            }
+                          }
+                        })
+                      ]
+                    )
+                  ])
+                ])
+              ]
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm._l(_vm.current.all_replies, function(reply) {
+          return _c("replies-component", {
+            key: _vm.current.id,
+            attrs: { current: reply }
+          })
+        })
+      ],
+      2
+    )
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-8065b990", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

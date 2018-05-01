@@ -32,7 +32,7 @@ class ApiTest extends TestCase
     }
     
     public function testGetAllSubmissions(){
-        $count = Submission::all()->count();
+        $count = Submission::where('parent_id',0)->count();
         $response = $this->get('/api/submissions');
         $response->assertJsonCount($count);
     }

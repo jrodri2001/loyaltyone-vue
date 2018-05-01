@@ -14,4 +14,19 @@ class Submission extends Model
     {
         return $this->belongsTo('App\User', 'user_id');
     }
+    
+    public function replies()
+    {
+        return $this->hasMany('App\Submission', 'parent_id');
+    }
+    
+    public function allReplies()
+    {
+        return $this->replies()->with(['allReplies','user']);
+    }
+    
+    public function owner()
+    {
+        return $this->belongsTo('App\Submission', 'parent_id');
+    }
 }

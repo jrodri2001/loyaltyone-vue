@@ -2,4 +2,5 @@
 
 @section('content')
     <submissions-component :user="{{Auth::user()}}"></submissions-component>
+
 @endsection
