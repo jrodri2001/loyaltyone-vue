@@ -20,7 +20,8 @@ class ApiTest extends TestCase
         
         $response = $this->post('/api/submission', [
             'text'=> $test,
-            'user_id' => 1
+            'user_id' => 1,
+            'city' => 'toronto'
         ]);
         
         $response->assertJsonFragment(['status'=>'ok']);
